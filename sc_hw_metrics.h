@@ -44,6 +44,7 @@ namespace sc_hw_metrics {
         sc_core::sc_out<double> output;
         double rate;
 
+        SC_HAS_PROCESS(basic_event);
         basic_event(const sc_core::sc_module_name& name, double rate) : output("output"),
                                                         rate(rate)
         {
@@ -64,6 +65,7 @@ namespace sc_hw_metrics {
         double dc;
         double lc;
 
+        SC_HAS_PROCESS(coverage);
         coverage(const sc_core::sc_module_name& name, double dc, double lc) : input("input"),
                                                    output("output"),
                                                    dc(dc),
@@ -106,6 +108,7 @@ namespace sc_hw_metrics {
         sc_core::sc_in<double> input;
         sc_split_out<double> outputs;
 
+        SC_HAS_PROCESS(split);
         split(const sc_core::sc_module_name& name) : sc_module(name), input("input")
         {
             SC_METHOD(compute_fit);
@@ -141,6 +144,7 @@ namespace sc_hw_metrics {
         sc_core::sc_port<sc_core::sc_signal_in_if<double>, 0, sc_core::SC_ONE_OR_MORE_BOUND> inputs;
         sc_core::sc_out<double> output;
 
+        SC_HAS_PROCESS(sum);
         sum(const sc_core::sc_module_name& name) : sc_core::sc_module(name), output("output")
         {
             SC_METHOD(compute_fit);
@@ -161,6 +165,7 @@ namespace sc_hw_metrics {
         sc_core::sc_in<double> input;
         sc_core::sc_out<double> output;
 
+        SC_HAS_PROCESS(pass);
         pass(const sc_core::sc_module_name& name) : sc_core::sc_module(name) {
             SC_METHOD(compute);
             sensitive << input;
@@ -182,6 +187,7 @@ namespace sc_hw_metrics {
 
         double total;
 
+        SC_HAS_PROCESS(asil);
         asil(const sc_core::sc_module_name& name, double total) : total(total) {
             SC_METHOD(compute);
             sensitive << residual << latent;

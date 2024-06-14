@@ -5,13 +5,25 @@ include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ Standard")
 
-FetchContent_Declare(
-  systemc
-  GIT_REPOSITORY https://github.com/accellera-official/systemc.git
-  GIT_TAG 3.0.0)
+option(GENERATE_DIAGRAM "Use SystemCHierarchy tool to generate a diagram" FALSE)
 
-set(DISABLE_COPYRIGHT_MESSAGE True)
-FetchContent_MakeAvailable(systemc)
+if(NOT GENERATE_DIAGRAM)
+  FetchContent_Declare(
+    systemc
+    GIT_REPOSITORY https://github.com/accellera-official/systemc.git
+    GIT_TAG 3.0.0)
+
+  set(DISABLE_COPYRIGHT_MESSAGE True)
+  FetchContent_MakeAvailable(systemc)
+else()
+  # Provides its own patched SystemC
+  FetchContent_Declare(
+    systemc_hierarchy
+    GIT_REPOSITORY git@erbenschell.iese.fraunhofer.de:Leistungzentrum/SystemCHierarchy.git
+    GIT_TAG derek_refactor
+  )
+  FetchContent_MakeAvailable(systemc_hierarchy)
+endif()
 
 FetchContent_Declare(
   googletest
@@ -40,6 +52,11 @@ target_link_libraries(dram-metrics-example PRIVATE SystemC::systemc iso26262syst
 
 add_executable(dram-metrics-refactored examples/dram-metrics-refactored.cpp)
 target_link_libraries(dram-metrics-refactored PRIVATE SystemC::systemc iso26262systemc)
+
+if(GENERATE_DIAGRAM)
+  target_compile_definitions(dram-metrics-refactored PRIVATE HIERARCHY_EXTRACTOR)
+  target_link_libraries(dram-metrics-refactored PRIVATE hierarchy_extractor)
+endif()
 
 # Testing
 enable_testing()

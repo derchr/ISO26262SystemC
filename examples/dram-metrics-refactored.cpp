@@ -36,6 +36,10 @@
 
 #include <sc_hw_metrics.h>
 
+#ifdef HIERARCHY_EXTRACTOR
+    #include "hierarchy_extractor.h"
+#endif
+
 #include <iostream>
 #include <systemc>
 
@@ -47,6 +51,7 @@ SC_MODULE(DRAM)
     sc_out<double> SBE, DBE, MBE, WD;
     double E_SBE, E_DBE, E_MBE, E_WD;
 
+    SC_HAS_PROCESS(DRAM);
     DRAM(const sc_module_name& name, double DRAM_FIT) :
         E_SBE(0.7 * DRAM_FIT),
         E_DBE(0.0748 * DRAM_FIT),
@@ -80,6 +85,7 @@ SC_MODULE(DRAM_SEC_ECC)
     pass mbe_pass, wd_pass;
     basic_event sec_broken;
 
+    SC_HAS_PROCESS(DRAM_SEC_ECC);
     DRAM_SEC_ECC(const sc_module_name& name) :
         I_SBE("I_SBE"),
         I_DBE("I_DBE"),
@@ -127,6 +133,7 @@ SC_MODULE(DRAM_SEC_TRIM)
 
     sc_signal<double> s1, s2, s3, s4, s5, s7, s8;
 
+    SC_HAS_PROCESS(DRAM_SEC_TRIM);
     DRAM_SEC_TRIM(const sc_module_name& name) :
         I_RES_SBE("I_RES_SBE"),
         I_RES_DBE("I_RES_DBE"),
@@ -196,6 +203,7 @@ SC_MODULE(DRAM_BUS_TRIM)
 
     sc_signal<double> s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
 
+    SC_HAS_PROCESS(DRAM_BUS_TRIM);
     DRAM_BUS_TRIM(const sc_module_name& name, double DRAM_FIT) :
         I_RES_SBE("I_RES_SBE"),
         I_RES_DBE("I_RES_DBE"),
@@ -294,6 +302,7 @@ SC_MODULE(DRAM_SEC_DED)
     basic_event sec_ded_broken;
     sc_signal<double> s1, s2, s3, s6, s7;
 
+    SC_HAS_PROCESS(DRAM_SEC_DED);
     DRAM_SEC_DED(const sc_core::sc_module_name& name) :
         res_sbe_cov("RES_SBE_COV", 1.0, 1.0),
         res_dbe_cov("RES_DBE_COV", 1.0, 1.0),
@@ -355,6 +364,7 @@ SC_MODULE(DRAM_SEC_DED_TRIM)
 
     sc_signal<double> s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
 
+    SC_HAS_PROCESS(DRAM_SEC_DED_TRIM);
     DRAM_SEC_DED_TRIM(const sc_module_name& name) :
         I_RES_SBE("I_RES_SBE"),
         I_RES_DBE("I_RES_DBE"),
@@ -434,6 +444,7 @@ SC_MODULE(ALL_OTHER_COMPONENTS)
     split other_split;
     coverage other_cov;
 
+    SC_HAS_PROCESS(ALL_OTHER_COMPONENTS);
     ALL_OTHER_COMPONENTS(const sc_module_name& name, double OTHER_COMPONENTS) :
         s0("s0"),
         s1("s1"),
@@ -455,6 +466,10 @@ SC_MODULE(ALL_OTHER_COMPONENTS)
 
 int sc_main(int __attribute__((unused)) sc_argc, char __attribute__((unused)) * sc_argv[])
 {
+#ifdef HIERARCHY_EXTRACTOR
+    hierarchy_extractor extractor("ex");
+#endif
+
     static constexpr double DRAM_FIT = 2300.0;
     static constexpr double OTHER_COMPONENTS = 1920.0;
     static constexpr double TOTAL = DRAM_FIT + OTHER_COMPONENTS;
